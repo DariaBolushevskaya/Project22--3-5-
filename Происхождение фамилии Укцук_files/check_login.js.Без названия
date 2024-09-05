@@ -1,0 +1,83 @@
+function CheckLoginControl(oLoginEdit, obtn_check_login, oajax_loader2, odiv_email_exists, odiv_email_new, op_incorrect_mail, obtn_get_diplom) 
+{
+    var loginEdit = oLoginEdit;
+    var currentLogin  = oLoginEdit.value;
+    var btn_check_login = obtn_check_login;
+    var ajax_loader2 = oajax_loader2;
+    var div_email_exists = odiv_email_exists;
+    var div_email_new = odiv_email_new;
+    var p_incorrect_mail = op_incorrect_mail;
+    var btn_get_diplom = obtn_get_diplom;
+	var me = this;	
+	var xmlHttp = createXmlHttpRequest();
+    
+    loginEdit.onblur = function(oEvent)
+    {
+        //me.checkLogin();
+    }
+    
+    this.checkLogin = function()
+    {
+        if(!loginEdit.value)
+            alert('Введите ваш e-mail');            
+        else if(currentLogin != loginEdit.value)
+        {    
+            btn_check_login.style.display = 'none';
+            div_email_exists.style.display = 'none';
+            div_email_new.style.display = 'none';
+            p_incorrect_mail.style.display = 'none';
+            btn_get_diplom.style.display = 'none';
+            ajax_loader2.style.display = 'block';
+            
+            
+            var o = 'login='+loginEdit.value;
+			xmlHttp.open('POST', '/ajax/check_login.php', true);
+			xmlHttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+			xmlHttp.send(o);
+			xmlHttp.onreadystatechange = function (oEvent) {
+		        if (!oEvent) {
+		            oEvent = window.event;
+		        }    
+		        me.handleServerResponce(oEvent);
+		    };
+		    currentLogin = loginEdit.value;
+        }        
+    }
+	
+	this.handleServerResponce = function()
+	{
+		if (xmlHttp.readyState == 4)
+			if (xmlHttp.status == 200)
+			{
+                btn_check_login.style.display = 'none';                
+                
+                
+                ajax_loader2.style.display = 'none';
+                p_incorrect_mail.style.display = 'none';
+                
+                switch(xmlHttp.responseText)
+                {
+                    case '1':
+                        p_incorrect_mail.style.display = 'block';
+                        div_email_exists.style.display = 'none';
+                        div_email_new.style.display = 'none';
+                        btn_get_diplom.style.display = 'none';
+                        break;
+                    case '2':
+                        p_incorrect_mail.style.display = 'none';
+                        div_email_exists.style.display = 'block';
+                        div_email_new.style.display = 'none';
+                        btn_get_diplom.style.display = 'block';
+                        break;
+                    case '3':
+                        p_incorrect_mail.style.display = 'none';
+                        div_email_exists.style.display = 'none';
+                        div_email_new.style.display = 'block';
+                        btn_get_diplom.style.display = 'block';
+                        break;
+                }
+                
+                			
+			}
+	}	
+}
